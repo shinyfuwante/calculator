@@ -1,3 +1,7 @@
+* {
+    font-family: 'Quicksand', sans-serif;
+}
+
 body {
     display: flex;
     justify-content: center;
@@ -9,6 +13,7 @@ body {
 button {
     width: 60px;
     height: 40px;
+    border-radius: 6px;
 }
 
 calculator-body {
@@ -16,13 +21,17 @@ calculator-body {
     border: 3px solid black;
     flex-flow: column;
     padding: 10px;
+    height: 100%;
+    width: 150%;
+    background-color: rgb(182, 189, 226);
 }
 
 clear-buttons {
-    border: 3px solid green;
     display: flex;
-    padding: 10px;
-    justify-content: space-evenly;
+    padding: 0px;
+    width: auto;
+    justify-content: space-between;
+    gap: 2px 5px;
 }
 
 clear-buttons>button{
@@ -31,26 +40,41 @@ clear-buttons>button{
 }
 
 display {
-    border: 3px solid gray;
-    height: 75px;
-    width: 600px;
-    margin-bottom: 10px;
+    justify-self: center;
+    height: 70px;
+    width: auto;
+    margin: 10px;
+    margin-bottom: 1px;
+    flex: 1 1 auto;
+    align-items: flex-end;
+    text-align: right;
+    background-color: rgba(188, 252, 236, 0.932);
+    border: 3px solid rgba(124, 155, 147, 0.932);
 }
 
 buttons {
-    border: 3px solid purple;
+    width: auto;
     display: flex;
     gap: 10px;
-    margin-top: 10px;
+    margin-top: 1px;
     flex-flow: column;
     justify-content: center;
     /*align-items: center;*/
     padding: 10px;
+    box-shadow: 0px;
+}
+button.operator {
+    background-color: lavender;
+}
+button.delete {
+    background-color: rgb(140, 205, 248);
+}
+button.clear {
+    background-color: rgb(255, 92, 80);
 }
 row {
     display: flex;
     flex: 1 1 auto;
-    border: 3px solid magenta;
     align-items: space-evenly;
     gap: 10px;
 }
