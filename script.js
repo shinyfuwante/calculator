@@ -76,7 +76,10 @@ function addNum(number) {
 }
 
 function addDecimal() {
-    if (resetCurrentFlag == true) reset();
+    if (resetCurrentFlag == true) {
+        reset();
+        display.textContent = '0';
+    }
     if (display.textContent.includes('.')) return;
     display.textContent += '.';
 }
@@ -90,7 +93,7 @@ function inputOperator(operator) {
 }
 
 function reset() {
-    display.textContent = null;
+    display.textContent = '';
     resetCurrentFlag = false;
 }
 
@@ -119,7 +122,7 @@ function idle() {
 }
 //Handle keyboard input ---------------------------------------------------------------------------------------------------
 function keyboardPress(e) {
-    console.log(e.key);
+    console.log(e.keyCode);
     if (e.key == 'Backspace') delButton.click();
     if (e.key == 'Escape') clearButton.click();
     if (e.key >= 0 || e.key < 10) {
@@ -129,7 +132,7 @@ function keyboardPress(e) {
     if (e.key == "*" || e.key == "/" || e.key == "+" || e.key == "-") {
         inputOperator(keyboardToButton(e.key));
     }
-    if (e.key == 'Enter' || e.key == '=') eval('=');
+    if (e.key == '=' || e.keyCode == '16') eval('=');
 }
 
 function keyboardToButton(key) {

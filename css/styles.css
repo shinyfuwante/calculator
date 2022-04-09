@@ -64,13 +64,15 @@ running-display {
     width: auto;
     flex: 1 1 auto;
     margin-bottom: 15px;
+
 }
 display {
     justify-self:flex-end;
     align-items: flex-end;
     position: relative;
     padding-right: 3px;
-    font-size: 40pt
+    font-size: 40pt;
+    overflow: auto;
 }
 
 math-buttons {
