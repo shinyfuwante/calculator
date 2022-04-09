@@ -1,15 +1,19 @@
 //Constants and initial values ---------------------------------------------------------------------
 const display = document.querySelector('display');
-const mathButtons = document.querySelectorAll('math-buttons');
-const clearButtons = document.querySelectorAll('clear-buttons');
+const runningDisplay = document.querySelector('running-display');
+const mathButtons = document.querySelectorAll('.digit');
+const operatorButtons = document.querySelectorAll('.operator');
+const equalsButton = document.querySelector('.equals');
+const clearButton = document.querySelector('.clear');
+const delButton = document.querySelector('.delete');
 const decimalButton = document.querySelector('.decimal');
-let runningSolution = 0;
-let lastPressed;
-let lastOperator;
-let justEvaluated; 
-display.innerText = '0';
-digitsArray = [0,1,2,3,4,5,6,7,8,9];
-ops = ['+','-','/','*'];
+
+display.textContent = '0';
+let currentOp;
+let operandA;
+let operandB;
+
+let resetCurrentFlag = false;
 
 //---------------------------------------------------------------------------------------------------
 /* The four mathematical operations
@@ -33,37 +37,13 @@ function multiply (a,b) {
 function divide (a,b) {
     if (b == 0) {
         alert('You tried to divide by zero!');
-        //maybe clear
-        return;
+        return false;
     }
     return Math.round(((a/b) * 100))/100; //rounds to two decimal places, may revisit later.
 }
 
-//Checking the button pressed -----------------------------------------------------------------------------
-
-function isNumber(e, keyboard = 0) {
-    if (keyboard == 1) return e.key in digitsArray;
-    return e.target.classList.contains('digit');
-}
-
-function isOperator(e, keyboard = 0) {
-    if (keyboard == 1) return e.key in ops;
-    return e.target.classList.contains('operator');
-}
-
-function isEquals(e, keyboard = 0) {
-    if (keyboard == 1) return (e.key == "=");
-    return e.target.classList.contains('equals');
-}
-
-function isDecimal(e, keyboard = 0) {
-    if (keyboard == 1) return (e.key == ".");
-    return e.target.classList.contains('decimal');
-}
-
 //operate---------------------------------------------------------------------------------------------------
 function operate (a,b, operator) {
-    justEvaluated = 1;
     switch (operator) {
         case "+":
             return add(+a,+b);
@@ -77,167 +57,91 @@ function operate (a,b, operator) {
             break;
     }
 }
+
+function eval(operator) {
+    if (currentOp == undefined || resetCurrentFlag == true) return;
+    operandB = display.textContent;
+    display.textContent = operate(operandA, operandB, currentOp);
+    runningDisplay.textContent = ` ${operandA} ${currentOp} ${operandB} =`
+    currentOp = undefined;
+    if (display.textContent == 'false') clear();
+}
+
 //click functions ---------------------------------------------------------------------------------------------------------
-function mathClick(e) {
-    if (isDecimal(e)) {
-        //disable the decimal
-        decimalButton.disabled = true;
-        //add the decimal by fallthrough
+function addNum(number) {
+    if (display.textContent == "0" || resetCurrentFlag == true) {
+        reset();
     }
-    //an operator CAN cause operate to occur, this can be replicated into equals;
-    //if the there was a prior operator, evaluate the display text.
-
-    if (isOperator(e)) {
-        opPress(e);
-        checkFloating();
-    } 
-    //a number NEVER causes operate() 
-    //a number only cares to input itself into the display.
-    //if an operator was the last thing pressed, clear display and enter a new number.
-    else if (isNumber(e)) {
-        checkFloating();
-        if (justEvaluated == 1 && lastPressed && !isOperator(lastPressed)) {
-            justEvaluated = 0;
-            clearDisplay();
-            resetState();
-        }
-        if(lastPressed && isOperator(lastPressed)) {
-            runningSolution = display.innerText;
-            decimalButton.disabled = false;
-            clearDisplay();
-        }  
-        numPress(e.target.innerText);
-        lastPressed = e;
-    }
-    else if (isEquals(e)) {
-        if(lastOperator) {
-            display.innerText = operate(runningSolution, display.innerText, lastOperator);
-            runningSolution = display.innerText;
-            lastOperator = undefined;
-        }
-        checkFloating()
-        return;
-    }
-}
-
-function clearClick(e) {
-    console.log(e.target);
-    if (e.target.classList.contains('clear')) clearDisplay();
-    if (e.target.classList.contains('delete')) backspace();
-}
-//keyboard methods-----------------------------------------------------------------------------------------------------------------
-function mathPress(e) {
-    console.log(e);
-    if (isDecimal(e,1)) {
-        //disable the decimal
-        decimalButton.disabled = true;
-        //add the decimal by fallthrough
-    }
-    //an operator CAN cause operate to occur, this can be replicated into equals;
-    //if the there was a prior operator, evaluate the display text.
-
-    if (isOperator(e,1)) {
-        opPress(e);
-        checkFloating();
-    } 
-    //a number NEVER causes operate() 
-    //a number only cares to input itself into the display.
-    //if an operator was the last thing pressed, clear display and enter a new number.
-    else if (isNumber(e,1)) {
-        checkFloating();
-        if(lastPressed && isOperator(lastPressed,1)) {
-            runningSolution = display.innerText;
-            decimalButton.disabled = false;
-            clearDisplay();
-        }  
-        numPress(e.key);
-        lastPressed = e;
-    }
-    else if (isEquals(e,1)) {
-        if(lastOperator) {
-            display.innerText = operate(runningSolution, display.innerText, lastOperator);
-            runningSolution = display.innerText;
-            lastOperator = undefined;
-        }
-        checkFloating()
-        return;
-    }
-}
-
-//button logic---------------------------------------------------------------------------------------------------------------
-function clearDisplay() {
-    //if double tapped, remove any memory.
-    if (display.innerText == "0") {
-        resetState();
-    }
-    display.innerText = "0";
-}
-
-function resetState() {
-    runningSolution = 0;
-    lastPressed = undefined;
-    lastOperator = undefined;
-    decimalButton.disabled = false;
-}
-
-function backspace() {
-    display.innerText = display.innerText.substring(0, display.innerText.length-1);
-}
-
-function numPress(digit) {
-    //when a button is pressed, it will append the corresponding digit to the text body.
-    if (display.innerText.length >= 9) {
-        alert('Maximum digits exceeded!');
-        return;
-    }
-    if (display.innerText == "0") display.innerText = String(digit);
-    else display.innerText += String(digit);
-}
-
-function opPress(e) {
-    if (lastPressed && isOperator(lastPressed)) {
-        //do nothing and update operator at the bottom
-        console.log('operator pressed when prior was op');
-    }
-    else if (lastOperator) {
-        display.innerText = operate(runningSolution, display.innerText, lastOperator);
-    }
-    if (!lastPressed || isNumber(lastPressed)) {
-        runningSolution = display.innerText;
-    } 
-    lastOperator = e.target.innerText;
-    lastPressed = e;
-}
-
-function checkFloating() {
-    console.log('has decimal: ' + display.innerText.includes('.'));
-    if (!display.innerText.includes('.')) decimalButton.disabled = false;
-    else decimalButton.disabled = true;
+    display.textContent += String(number);
 }
 
 function addDecimal() {
-    if (display.innerText.length >= 9) {
-        alert('Maximum digits exceeded!');
-        return;
-    }
-    if (display.innerText == "0") display.innerText = "0.";
-    else display.innerText += ".";
-    decimalButton.disabled = true;
+    if (resetCurrentFlag == true) reset();
+    if (display.textContent.includes('.')) return;
+    display.textContent += '.';
+}
+
+function inputOperator(operator) {
+    if (currentOp != undefined) eval(operator);
+    operandA = display.textContent;
+    currentOp = operator;
+    runningDisplay.textContent = ` ${operandA} ${currentOp} `
+    resetCurrentFlag = true;
+}
+
+function reset() {
+    display.textContent = null;
+    resetCurrentFlag = false;
+}
+
+function clear() {
+    operandA = null;
+    operandB = null;
+    currentOp = null;
+    runningDisplay.textContent = '';
+    display.textContent = '0';
+}
+
+function backspace() {
+    display.textContent = display.textContent.substring(0, display.textContent.length-1);
+    if (display.textContent == '') display.textContent += '0';
 }
 //Listeners---------------------------------------------------------------------------------------------------------------- 
 
 function idle() {
-    const mathListener = mathButtons.forEach(row => row.addEventListener('click', mathClick));
-    const clearListener = clearButtons.forEach(button => button.addEventListener('click', clearClick));
-    const kbListener = window.addEventListener('keypress', keyboardPress);
+    mathButtons.forEach(button => button.addEventListener('click', () => addNum(button.textContent)));
+    operatorButtons.forEach(button => button.addEventListener('click', () => inputOperator(button.textContent)));
+    equalsButton.addEventListener('click', () => eval(equalsButton.textContent));
+    clearButton.addEventListener('click', () => clear());
+    decimalButton.addEventListener('click', () => addDecimal());
+    delButton.addEventListener('click', () => backspace());
+    window.addEventListener('keydown', keyboardPress);
 }
 //Handle keyboard input ---------------------------------------------------------------------------------------------------
 function keyboardPress(e) {
     console.log(e.key);
-    if (e.key >= 0 && e.key <= 9) numPress(e.key);
+    if (e.key == 'Backspace') delButton.click();
+    if (e.key == 'Escape') clearButton.click();
+    if (e.key >= 0 || e.key < 10) {
+        addNum(e.key);
+    }
     if (e.key == '.') addDecimal();
-    if (e.key == '=' || e.key === 'Enter');
-    if (e.key == '+' || e.key == '-' || e.key == '*' || e.key == '/');
+    if (e.key == "*" || e.key == "/" || e.key == "+" || e.key == "-") {
+        inputOperator(keyboardToButton(e.key));
+    }
+    if (e.key == 'Enter' || e.key == '=') eval('=');
+}
+
+function keyboardToButton(key) {
+    switch (key) {
+        case '*':
+            return '×';
+        case '/':
+            return '÷';
+        case '+':
+        case '-':
+            return key;
+    }
 }
 
 

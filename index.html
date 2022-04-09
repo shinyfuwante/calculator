@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>Calculator</title>
     <script src="script.js" defer></script>
     <link rel="stylesheet" href="css/styles.css">
     <style>
@@ -13,8 +13,10 @@
 </head>
 <body>
     <calculator-body>
-        <display> 
-        </display>
+        <screen>
+            <running-display></running-display>
+            <display></display>
+        </screen>
         <clear-buttons>
             <button class="delete">
                 DELETE
@@ -51,7 +53,7 @@
 
             <row>
                 <button data-key="48" class="digit zero">0</button>
-                <button data-key="46" class="digit decimal">.</button>
+                <button data-key="46" class="decimal">.</button>
                 <button data-key="61" class="equals">=</button>
                 <button data-key="43" class="add operator">+</button>
             </row>

@@ -27,6 +27,23 @@ calculator-body {
     background-color: rgb(182, 189, 226);
     border-radius: 5px;
 }
+screen {
+    display: flex;
+    flex-flow: column;
+    justify-self: center;
+    height: 60px;
+    width: auto;
+    margin: 10px;
+    margin-bottom: 1px;
+    flex: 1 2 auto;
+    align-items: space-between;
+    text-align: right;
+    background-color: rgba(188, 252, 236, 0.932);
+    border: 3px solid rgba(124, 155, 147, 0.932);
+    font-size: 50px;
+    border-radius: 5px;
+    padding-right: 3px;
+}
 
 clear-buttons {
     display: flex;
@@ -40,21 +57,15 @@ clear-buttons>button{
     flex: 1 1 auto;
     margin: 10px;
 }
-
-display {
+running-display {
     justify-self: center;
-    height: 80px;
+    height: 20px;
     width: auto;
-    margin: 10px;
-    margin-bottom: 1px;
-    flex: 1 2 auto;
-    align-items: flex-end;
-    text-align: right;
-    background-color: rgba(188, 252, 236, 0.932);
-    border: 3px solid rgba(124, 155, 147, 0.932);
-    font-size: 50px;
-    border-radius: 5px;
-    padding-right: 3px;
+    flex: 1 1 auto;
+}
+display {
+    height: 50px;
+    justify-self:flex-end;
 }
 
 math-buttons {
