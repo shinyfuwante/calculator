@@ -64,6 +64,7 @@ function eval(operator) {
     display.textContent = operate(operandA, operandB, currentOp);
     runningDisplay.textContent = ` ${operandA} ${currentOp} ${operandB} =`
     currentOp = undefined;
+    resetCurrentFlag = true;
     if (display.textContent == 'false') clear();
 }
 
