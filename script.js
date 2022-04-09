@@ -144,5 +144,4 @@ function keyboardToButton(key) {
     }
 }
 
-
 idle();
