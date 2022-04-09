@@ -7,6 +7,8 @@ let runningSolution = 0;
 let lastPressed;
 let lastOperator;
 display.innerText = '0';
+digitsArray = [0,1,2,3,4,5,6,7,8,9];
+ops = ['+','-','/','*'];
 
 //---------------------------------------------------------------------------------------------------
 /* The four mathematical operations
@@ -38,19 +40,23 @@ function divide (a,b) {
 
 //Checking the button pressed -----------------------------------------------------------------------------
 
-function isNumber(e) {
+function isNumber(e, keyboard = 0) {
+    if (keyboard == 1) return e.key in digitsArray;
     return e.target.classList.contains('digit');
 }
 
-function isOperator(e) {
+function isOperator(e, keyboard = 0) {
+    if (keyboard == 1) return e.key in ops;
     return e.target.classList.contains('operator');
 }
 
-function isEquals(e) {
+function isEquals(e, keyboard = 0) {
+    if (keyboard == 1) return (e.key == "=");
     return e.target.classList.contains('equals');
 }
 
-function isDecimal(e) {
+function isDecimal(e, keyboard = 0) {
+    if (keyboard == 1) return (e.key == ".");
     return e.target.classList.contains('decimal');
 }
 
@@ -70,9 +76,7 @@ function operate (a,b, operator) {
     }
 }
 //click functions ---------------------------------------------------------------------------------------------------------
-//TODO implement decimal
 function mathClick(e) {
-    console.log(e.target);
     if (isDecimal(e)) {
         //disable the decimal
         decimalButton.disabled = true;
@@ -114,6 +118,45 @@ function clearClick(e) {
     if (e.target.classList.contains('clear')) clearDisplay();
     if (e.target.classList.contains('delete')) backspace();
 }
+//keyboard methods-----------------------------------------------------------------------------------------------------------------
+function mathPress(e) {
+    console.log(e);
+    if (isDecimal(e,1)) {
+        //disable the decimal
+        decimalButton.disabled = true;
+        //add the decimal by fallthrough
+    }
+    //an operator CAN cause operate to occur, this can be replicated into equals;
+    //if the there was a prior operator, evaluate the display text.
+
+    if (isOperator(e,1)) {
+        opPress(e);
+        checkFloating();
+    } 
+    //a number NEVER causes operate() 
+    //a number only cares to input itself into the display.
+    //if an operator was the last thing pressed, clear display and enter a new number.
+    else if (isNumber(e,1)) {
+        checkFloating();
+        if(lastPressed && isOperator(lastPressed,1)) {
+            runningSolution = display.innerText;
+            decimalButton.disabled = false;
+            clearDisplay();
+        }  
+        numPress(e.key);
+        lastPressed = e;
+    }
+    else if (isEquals(e,1)) {
+        if(lastOperator) {
+            display.innerText = operate(runningSolution, display.innerText, lastOperator);
+            runningSolution = display.innerText;
+            lastOperator = undefined;
+        }
+        checkFloating()
+        return;
+    }
+}
+
 //button logic---------------------------------------------------------------------------------------------------------------
 function clearDisplay() {
     //if double tapped, remove any memory.
@@ -172,6 +215,7 @@ function addDecimal() {
     }
     if (display.innerText == "0") display.innerText = "0.";
     else display.innerText += ".";
+    decimalButton.disabled = true;
 }
 //Listeners---------------------------------------------------------------------------------------------------------------- 
 
@@ -180,5 +224,14 @@ function idle() {
     const clearListener = clearButtons.forEach(button => button.addEventListener('click', clearClick));
     const kbListener = window.addEventListener('keypress', keyboardPress);
 }
+//Handle keyboard input ---------------------------------------------------------------------------------------------------
+function keyboardPress(e) {
+    console.log(e.key);
+    if (e.key >= 0 && e.key <= 9) numPress(e.key);
+    if (e.key == '.') addDecimal();
+    if (e.key == '=' || e.key === 'Enter');
+    if (e.key == '+' || e.key == '-' || e.key == '*' || e.key == '/');
+}
+
 
 idle();
