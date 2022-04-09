@@ -2,6 +2,7 @@
 const display = document.querySelector('display');
 const mathButtons = document.querySelectorAll('math-buttons');
 const clearButtons = document.querySelectorAll('clear-buttons');
+const decimalButton = document.querySelector('.decimal');
 let runningSolution = 0;
 let lastPressed;
 let lastOperator;
@@ -15,15 +16,15 @@ display.innerText = '0';
 */ 
 
 function add(a,b) {
-    return a+b;
+    return Math.round(((a+b) * 100))/100;
 }
 
 function subtract (a,b) {
-    return a-b;
+    return Math.round(((a-b) * 100))/100;
 }
 
 function multiply (a,b) {
-    return a*b;
+    return Math.round(((a*b) * 100))/100;
 }
 
 function divide (a,b) {
@@ -46,7 +47,11 @@ function isOperator(e) {
 }
 
 function isEquals(e) {
-    return e.target.classList.contains('equals')
+    return e.target.classList.contains('equals');
+}
+
+function isDecimal(e) {
+    return e.target.classList.contains('decimal');
 }
 
 //operate---------------------------------------------------------------------------------------------------
@@ -68,18 +73,26 @@ function operate (a,b, operator) {
 //TODO implement decimal
 function mathClick(e) {
     console.log(e.target);
+    if (isDecimal(e)) {
+        //disable the decimal
+        decimalButton.disabled = true;
+        //add the decimal by fallthrough
+    }
     //an operator CAN cause operate to occur, this can be replicated into equals;
     //if the there was a prior operator, evaluate the display text.
 
     if (isOperator(e)) {
         opPress(e);
+        checkFloating();
     } 
     //a number NEVER causes operate() 
     //a number only cares to input itself into the display.
     //if an operator was the last thing pressed, clear display and enter a new number.
     else if (isNumber(e)) {
+        checkFloating();
         if(lastPressed && isOperator(lastPressed)) {
             runningSolution = display.innerText;
+            decimalButton.disabled = false;
             clearDisplay();
         }  
         numPress(e.target.innerText);
@@ -91,6 +104,7 @@ function mathClick(e) {
             runningSolution = display.innerText;
             lastOperator = undefined;
         }
+        checkFloating()
         return;
     }
 }
@@ -113,6 +127,7 @@ function resetState() {
     runningSolution = 0;
     lastPressed = undefined;
     lastOperator = undefined;
+    decimalButton.disabled = false;
 }
 
 function backspace() {
@@ -143,11 +158,27 @@ function opPress(e) {
     lastOperator = e.target.innerText;
     lastPressed = e;
 }
+
+function checkFloating() {
+    console.log('has decimal: ' + display.innerText.includes('.'));
+    if (!display.innerText.includes('.')) decimalButton.disabled = false;
+    else decimalButton.disabled = true;
+}
+
+function addDecimal() {
+    if (display.innerText.length >= 9) {
+        alert('Maximum digits exceeded!');
+        return;
+    }
+    if (display.innerText == "0") display.innerText = "0.";
+    else display.innerText += ".";
+}
 //Listeners---------------------------------------------------------------------------------------------------------------- 
 
 function idle() {
     const mathListener = mathButtons.forEach(row => row.addEventListener('click', mathClick));
     const clearListener = clearButtons.forEach(button => button.addEventListener('click', clearClick));
+    const kbListener = window.addEventListener('keypress', keyboardPress);
 }
 
 idle();
