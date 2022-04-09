@@ -6,6 +6,7 @@ const decimalButton = document.querySelector('.decimal');
 let runningSolution = 0;
 let lastPressed;
 let lastOperator;
+let justEvaluated; 
 display.innerText = '0';
 digitsArray = [0,1,2,3,4,5,6,7,8,9];
 ops = ['+','-','/','*'];
@@ -62,6 +63,7 @@ function isDecimal(e, keyboard = 0) {
 
 //operate---------------------------------------------------------------------------------------------------
 function operate (a,b, operator) {
+    justEvaluated = 1;
     switch (operator) {
         case "+":
             return add(+a,+b);
@@ -94,6 +96,11 @@ function mathClick(e) {
     //if an operator was the last thing pressed, clear display and enter a new number.
     else if (isNumber(e)) {
         checkFloating();
+        if (justEvaluated == 1 && lastPressed && !isOperator(lastPressed)) {
+            justEvaluated = 0;
+            clearDisplay();
+            resetState();
+        }
         if(lastPressed && isOperator(lastPressed)) {
             runningSolution = display.innerText;
             decimalButton.disabled = false;
